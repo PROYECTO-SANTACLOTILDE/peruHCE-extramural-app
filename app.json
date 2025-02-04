@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "peruHCE-extramural-app",
+    "slug": "peruHCE-extramural-app",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.marcelogal.peruHCEextramuralapp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6272911b-0be9-4da8-b874-6f4171be0c5c"
+      }
+    },
+    "owner": "marcelogal"
+  }
+}
