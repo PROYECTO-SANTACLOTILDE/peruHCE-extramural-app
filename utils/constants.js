@@ -1,7 +1,8 @@
+//Auxiliar Pending to change
 export const USER = "admin";
 export const PASSWORD = "Admin123";
 
-//DATABASE
+// Database
 export const DB_NAME = "hii1scExtramural.db";
 export const DB_VERSION = 1; //Version of the the DB, update this number for every version
 
@@ -19,4 +20,15 @@ export const OK_STATUS = "OK";
 export const BAD_STATUS = "BAD";
 export const OK_MESSAGE = "Working as intended";
 export const ERROR_RESULT = "ERROR";
+
+// Log Code
+export const LOG_PATIENT = 'Patient';
+export const LOG_FORM = 'Form';
+export const LOG_USER = 'User';
+export const LOG_COHORT = 'Cohort';
+export const LOG_VISIT = 'Visit';
+export const LOG_VISIT_ATTR = 'VisitAttr';
+export const LOG_ENCOUNTER_ATTR = 'EncounterAttr';
+export const LOG_VARIABLE = 'Variable';
+
 

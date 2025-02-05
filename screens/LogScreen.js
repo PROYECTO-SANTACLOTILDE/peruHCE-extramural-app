@@ -7,45 +7,42 @@ import { useSQLiteContext } from 'expo-sqlite';
 
 //Dummy Data
 import { VariableEditor } from '../components/VariableEditor';
+import { LogVisor } from '../components/LogVisor';
 
-export default function ConfigurationScreen() {
+export default function LogScreen() {
 
     //Open Database
     const db = useSQLiteContext();
     
     //Patient List Data
-    const [configVariables, setConfigVariables] = useState([]);
+    const [logData, setlogData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
 
-    const consultConfigVariables = async () => {
-        setLoading(true);
-        try {           
+    const consultLogs = async () => {
+        
+        try {     
 
-            let variablesRows = await db.getAllAsync("SELECT * FROM Variable WHERE active = '1';");
+            setLoading(true);      
 
-            setConfigVariables(variablesRows);
+            let logsRows = await db.getAllAsync("SELECT * FROM Log WHERE active = '1';");
+
+            setlogData(logsRows);
+            //console.log('logRows: ',logsRows);
             
             setError(null);
 
         } catch (err) {
-            setError(err.message || 'Failed to consult data');
-            console.error('Error consulting data:', err);
+            throw new Error('Error consulting Log data from db.');
         } finally {
             setLoading(false);
         }
     }; 
 
-
-    const onRefresh = async () => {
-        setLoading(true);
-        await consultConfigVariables();
-        setLoading(false);
-    };
-    
+   
     useEffect(() => {
-        consultConfigVariables();
+        consultLogs();
     }, []);
 
     return (
@@ -57,15 +54,14 @@ export default function ConfigurationScreen() {
                     </Text>
                 </View>
             ) : (         
-                configVariables ? (
-                    <VariableEditor 
-                        variableList={configVariables} 
-                        refreshVariables={consultConfigVariables}
+                logData.length > 0 ? (
+                    <LogVisor 
+                        logData={logData} 
                     />                    
                 ) : (
                     <View style={styles.alertContainer}>
                         <Text style={styles.alert} >
-                            No hay variables configuradas. Recomendamos reinstalar la aplicación.
+                            No se encontraron logs en el sistema.
                         </Text>
                     </View>                    
                 )                

@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Modal, ScrollView} from "react-native";
 import { fillCohortMembersDB } from '../utils/cohortFunctions';
-import { COLOR_BLACK, COLOR_DARK_GREEN } from '../utils/constants';
 import { updateVariableDb } from '../utils/dbUtils/dbVariableFunctions';
 
+import styles from './VariableEditorStyles.js';
 
 import { useSQLiteContext } from 'expo-sqlite';
 
@@ -27,35 +27,40 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
         setModalVisible(!isModalVisible);
     }
 
-    const handlePress = async () => {
-        const baseUrlVariable = variableList.find(item => item.key === "BASE_URL");
-        if(baseUrlVariable === undefined){
-            console.error('No BASE_URL variable found in database.');
-            return;
-        }
-        const baseUrl = baseUrlVariable ? baseUrlVariable.value : "";
-        
-        const baseEndpointVariable = variableList.find(item => item.key === "BASE_ENDPOINT");
-        if(baseUrlVariable === undefined){
-            console.error('No BASE_ENDPOINT variable found in database.');
-            return;
-        }        
-        const endPoint = baseEndpointVariable ? baseEndpointVariable.value : "";
+    const handlePress = async (db) => {
+        try{
+            //console.log('variableList: ',variableList);
 
-        const cohortVariable = variableList.find(item => item.key === "COHORT");
-        if(baseUrlVariable === undefined){
-            console.error('No COHORT variable found in database.');
-            return;
-        }  
-        const cohortUUID = cohortVariable ? cohortVariable.value : null;
+            const baseUrlVariable = variableList.find(item => item.key === "BASE_URL");
+            //console.log('baseUrl: ',baseUrlVariable);
+            if(baseUrlVariable === undefined){
+                throw new Error("No BASE_URL variable found in database.");
+            }            
+            const baseUrl = baseUrlVariable.value;
+            //console.log('baseUrl: ',baseUrl);
+            
+            const baseEndpointVariable = variableList.find(item => item.key === "BASE_ENDPOINT");
+            //console.log('endPoint: ',baseEndpointVariable);
+            if(baseEndpointVariable === undefined){
+                throw new Error('No BASE_ENDPOINT variable found in database.');
+            }   
+            const endPoint = baseEndpointVariable.value;
+            //console.log('endPoint: ',endPoint);
+
+            const cohortVariable = variableList.find(item => item.key === "COHORT");
+            //console.log('cohortUUID: ',cohortVariable);
+            if(cohortVariable === undefined){
+                throw new Error('No COHORT variable found in database.');
+            }  
+            const cohortUUID = cohortVariable.value;
+            //console.log('cohortUUID: ',cohortUUID);
+
+            let result = await fillCohortMembersDB(db, baseUrl, endPoint, cohortUUID);
+
+        }catch (err) {
+            throw new Error('Error getting variables to fetch cohort members: ', err);
+        }    
         
-        try	{
-            const result = await fillCohortMembersDB(baseUrl, endPoint, cohortUUID);  
-        } catch (err) {
-            console.error('Error getting data from server:', err);
-        } finally {
-            console.log('Cohort Members: ',result);
-        }
              
     };
 
@@ -121,7 +126,7 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
                 </View>
             </Modal>
 
-            <Button title="Cargar pacientes" onPress={handlePress} />
+            <Button title="Cargar pacientes" onPress={() => handlePress(db) } />
         
         </ScrollView>        
       </View>
@@ -129,89 +134,3 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
 };
 
 
-//Styles
-const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-    },
-    row: {
-        flexDirection: 'row',
-        marginBottom: 8,
-    },
-    key: {
-        fontWeight: 'bold',
-        marginRight: 8,
-    },
-    value: {
-        color: 'gray',
-    },
-    variableLabel: {
-        fontWeight: 'bold',
-        fontSize: 18,
-        color: COLOR_BLACK,
-        marginRight: 10,
-        width: 210,
-    },
-    variableValue: {
-        fontSize: 18,
-        color: COLOR_BLACK,
-        marginRight: 10,
-        width: '82%',
-    },
-    input:{
-        width: '72%',
-        borderWidth: 1,
-        borderColor: COLOR_BLACK,
-
-    },
-    inputEditor:{
-        width: 500,
-        borderWidth: 1,
-        borderColor: COLOR_BLACK,
-
-    },
-    variableRow: {
-        borderWidth: 3,
-        borderColor: COLOR_DARK_GREEN,
-        padding: 10,
-        marginBottom: 5,
-        borderRadius: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    variableValueContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    variableButtonContainer: {        
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }, 
-    modalEditorContainer: {
-        width: '100%',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    modalEditorView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-        width: 0,
-        height: 2,
-        },
-        shadowOpacity: 0.75,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    modalEditoButtonContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
-});

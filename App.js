@@ -14,12 +14,13 @@ import * as ScreenOrientation from "expo-screen-orientation";
 
 //Screens
 import { COLOR_DARK_GREEN, COLOR_RED, COLOR_WHITE, DB_NAME } from './utils/constants';
-import { fillDummyCohort, fillDummyForm, fillDummyPatients, fillDummyVariables, resetDB_user_version } from './utils/dbUtils/fillDummyData.js';
-import { CohortTableScript, FormTableScript, LogTableScript, PatientTableScript, UserTableScript, VariablesTableScript, VisitAttributesTableScript, VisitTableScript } from './utils/dbUtils/dbInitializationScripts';
+import { cleanDB, fillDummyCohort, fillDummyForm, fillDummyPatients, fillDummyVariables, resetDB_user_version } from './utils/dbUtils/fillDummyData.js';
+import { CohortTableScript, EncounterAttributesTableScript, EraseRowsTablesScript, FormTableScript, LogTableScript, PatientTableScript, UserTableScript, VariablesTableScript, VisitAttributesTableScript, VisitTableScript } from './utils/dbUtils/dbInitializationScripts';
 import FormsScreen from './screens/FormsScreen';
 import PatientListScreen from './screens/PatientListScreen';
 import VisitInfoScreen from './screens/VisitInfoScreen';
 import ConfigurationScreen from './screens/ConfigurationScreen';
+import LogScreen from './screens/LogScreen.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,7 +28,9 @@ const Stack = createNativeStackNavigator();
 
 const HomeButtonGrid = () => {
 
+  const db = useSQLiteContext();
   const navigation = useNavigation();
+
   return (
     <View style={styles.container}> 
       <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -93,33 +96,53 @@ const HomeButtonGrid = () => {
               {buttonsInfo[5].name}
             </Text>
           </TouchableOpacity>
+          {/* Visor de Logs */}
+          <TouchableOpacity
+            key={7}
+            style={styles.button}
+            onPress={() => navigation.navigate(buttonsInfo[6].screen)}
+          >
+            <Text style={{ color: 'white', fontWeight: '300', textAlign: 'center' }}>
+              {buttonsInfo[6].name}
+            </Text>
+          </TouchableOpacity>
       </View>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         {/* Fill dummy patient data */}
         <TouchableOpacity
             key={1}
             style={styles.buttonDev}
-            onPress={() => fillDummyPatients()}
+            onPress={() => fillDummyPatients(db)}
           >
           <Text style={{ color: 'white', fontWeight: '300', textAlign: 'center' }}>
-            Llenar datos dummy
+            Llenar pacientes dummy
           </Text>
         </TouchableOpacity>
         {/* Reset user_version*/}
         <TouchableOpacity
             key={2}
             style={styles.buttonDev}
-            onPress={() => resetDB_user_version()}
+            onPress={() => resetDB_user_version(db)}
           >
             <Text style={{ color: 'white', fontWeight: '300', textAlign: 'center' }}>
               Resetear DB
             </Text>
         </TouchableOpacity>
-        {/* Fill dummy form data */}
-        <TouchableOpacity
+         {/* Empty db tables*/}
+         <TouchableOpacity
             key={3}
             style={styles.buttonDev}
-            onPress={() => fillDummyForm()}
+            onPress={() => cleanDB(db)}
+          >
+            <Text style={{ color: 'white', fontWeight: '300', textAlign: 'center' }}>
+              Limpiar DB
+            </Text>
+        </TouchableOpacity>
+        {/* Fill dummy form data */}
+        <TouchableOpacity
+            key={4}
+            style={styles.buttonDev}
+            onPress={() => fillDummyForm(db)}
           >
           <Text style={{ color: 'white', fontWeight: '300', textAlign: 'center' }}>
             Llenar form dummy
@@ -127,9 +150,9 @@ const HomeButtonGrid = () => {
         </TouchableOpacity>
         {/* Fill dummy cohort visit data */}
         <TouchableOpacity
-            key={4}
+            key={5}
             style={styles.buttonDev}
-            onPress={() => fillDummyCohort()}
+            onPress={() => fillDummyCohort(db)}
           >
           <Text style={{ color: 'white', fontWeight: '300', textAlign: 'center' }}>
             Llenar cohort visit dummy
@@ -137,9 +160,9 @@ const HomeButtonGrid = () => {
         </TouchableOpacity>
         {/* Fill dummy variables */}
         <TouchableOpacity
-            key={5}
+            key={6}
             style={styles.buttonDev}
-            onPress={() => fillDummyVariables()}
+            onPress={() => fillDummyVariables(db)}
           >
           <Text style={{ color: 'white', fontWeight: '300', textAlign: 'center' }}>
             Llenar variables dummy
@@ -169,8 +192,8 @@ export default function App() {
               <Stack.Screen name="Formularios Cargados" component={FormsScreen} />
               <Stack.Screen name="Ajuste de Visita" component={VisitInfoScreen} />
               <Stack.Screen name="Configuración" component={ConfigurationScreen} />
-              {/*<Stack.Screen name="Screen4" component={Screen4} />
-              <Stack.Screen name="Screen5" component={Screen5} />
+              <Stack.Screen name="Visor de Logs" component={LogScreen} />
+              {/*<Stack.Screen name="Screen5" component={Screen5} />
               <Stack.Screen name="Screen6" component={Screen6} /> */}
             </Stack.Navigator>     
         </NavigationContainer>  
@@ -216,7 +239,7 @@ const buttonsInfo = [
   { name: 'Ajuste de Visita',       screen: 'Ajuste de Visita' },
   { name: 'Información de visita',  screen: 'Screen5' },
   { name: 'Configuración',          screen: 'Configuración' },
-
+  { name: 'Visor de Logs',          screen: 'Visor de Logs' },
 ];
 
 async function migrateDbIfNeeded(db) {
@@ -225,7 +248,7 @@ async function migrateDbIfNeeded(db) {
   const dbKey = process.env.EXPO_PUBLIC_DB_KEY;
 
   console.log("Starting Database");
-  console.log("Using key:",dbKey);
+  console.log("Using key: ",dbKey);
   const DATABASE_VERSION = 1;
   let first =  await db.execAsync(`PRAGMA key = '${dbKey}';`);
   let result = await db.getFirstAsync('PRAGMA user_version');
@@ -233,10 +256,11 @@ async function migrateDbIfNeeded(db) {
   console.log('InDevice: ',currentDbVersion,' Version: ',DATABASE_VERSION);
   
   
-  if (currentDbVersion >= DATABASE_VERSION) {
+  console.log('Creating database on init');
+  /* if (currentDbVersion >= DATABASE_VERSION) {
     console.log('Not creating tables');
     return;
-  }
+  } */
   
 
   if (currentDbVersion === 0) {
@@ -246,9 +270,10 @@ async function migrateDbIfNeeded(db) {
                       UserTableScript +
                       FormTableScript +
                       CohortTableScript + 
-                      VisitTableScript +
+                      VisitTableScript +                       
                       VisitAttributesTableScript +
                       VariablesTableScript + 
+                      EncounterAttributesTableScript +
                       LogTableScript;
     
     await db.execAsync(finalScript);

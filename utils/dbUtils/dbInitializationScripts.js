@@ -41,7 +41,7 @@ export const UserTableScript = `
 CREATE TABLE IF NOT EXISTS User (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     uuid TEXT NOT NULL,
-    displayNameName TEXT,
+    displayName TEXT,
     role TEXT NOT NULL,
     roleDescription TEXT NOT NULL,
     active TEXT
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS Variable (
 );`;
 
 export const LogTableScript = `  
-CREATE TABLE IF NOT EXISTS Variable (
+CREATE TABLE IF NOT EXISTS Log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     type TEXT,
     content TEXT,

@@ -1,17 +1,17 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { DB_NAME } from '../utils/constants';
+
 
 //Dummy Data
 import patientListDummy from "../utils/dummy/ListPatientsDummy.json"; 
 import { PatientListTableDB } from '../components/PatientListTable';
 
 //SQL Lite Screen
-import * as SQLite from 'expo-sqlite';
+import { useSQLiteContext } from 'expo-sqlite';
 
 export default function PatientListScreen() {
 
-    
+    const db = useSQLiteContext();
     
     //Patient List Data
     const [patients, setPatients] = useState([]);
@@ -19,13 +19,14 @@ export default function PatientListScreen() {
     const [error, setError] = useState(null);
 
     const consultPatients = async () => {
-        setLoading(true);
-        try {           
+        
+        try {          
+            setLoading(true); 
 
             //Open Database
-            const db = await SQLite.openDatabaseAsync(DB_NAME);
+            //const db = await SQLite.openDatabaseAsync(DB_NAME);
 
-            let patientList = await db.getAllAsync('SELECT * FROM Patient');
+            let patientList = await db.getAllAsync(`SELECT * FROM Patient WHERE active = '1';`);
 
             setPatients(patientList);
             
