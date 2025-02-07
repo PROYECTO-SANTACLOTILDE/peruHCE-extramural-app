@@ -4,7 +4,9 @@ import { DB_NAME } from '../constants';
 
 //JSON dummy
 import dummyForm from '../dummy/FormDummy.json';
+import dummyForm2 from '../dummy/FormDummy2.json';
 import { EraseRowsTablesScript, ResetTablesScript } from './dbInitializationScripts';
+import { replaceQuoteInForm } from '../formFunctions';
 
 export async function fillDummyPatients(db) {
 
@@ -15,14 +17,16 @@ export async function fillDummyPatients(db) {
         ('abc', '56789012', 'Alice',    'Johnson',  'Johnson',  'Lee',      'Mujer',    '2020-09-25T00:00:00.000+0000',     'test', '1'),
         ('abc', '34567890', 'Bob',      'White',    'White',    'Garcia',   'Hombre',   '2020-09-25T00:00:00.000+0000',     'test', '1');
     `);
+    
 }
 
 export async function fillDummyForm(db) {
-
-    await db.execAsync(`
+    //console.log(JSON.stringify(dummyForm2));
+    const result = await db.execAsync(`
         INSERT INTO Form (uuid, name, description, body, encounterType, encounterTypeUUID, active) VALUES
-        ('abc',     'SOAP Note Template', 'SOAP Note Template',    '` + JSON.stringify(dummyForm)+`',     'Visit Note',      'd7151f82-c1f3-4152-a605-2f9ea7414a79',  '1');        
+        ('abc',     'SOAP Note Template', 'SOAP Note Template', '${replaceQuoteInForm( JSON.stringify(dummyForm2) )}', 'Visit Note',      'd7151f82-c1f3-4152-a605-2f9ea7414a79',  '1');        
     `);
+    console.log('result: ',result);
 }
 
 export async function fillDummyCohort(db) {

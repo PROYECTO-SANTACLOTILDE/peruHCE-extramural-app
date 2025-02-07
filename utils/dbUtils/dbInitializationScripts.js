@@ -2,6 +2,8 @@ export const ResetTablesScript = `
     DROP TABLE IF EXISTS Patient;
     DROP TABLE IF EXISTS User;
     DROP TABLE IF EXISTS Form;
+    DROP TABLE IF EXISTS Observation;
+    DROP TABLE IF EXISTS ObservationValue;
     DROP TABLE IF EXISTS Cohort;
     DROP TABLE IF EXISTS Visit;
     DROP TABLE IF EXISTS VisitAttribute;
@@ -14,6 +16,8 @@ export const EraseRowsTablesScript = `
     DELETE FROM Patient;
     DELETE FROM User;
     DELETE FROM Form;
+    DELETE FROM Observation;
+    DELETE FROM ObservationValue;
     DELETE FROM Cohort;
     DELETE FROM Visit;
     DELETE FROM VisitAttribute;
@@ -59,6 +63,31 @@ CREATE TABLE IF NOT EXISTS Form (
     encounterTypeUUID TEXT,
     active TEXT    
 );`;
+
+//Observation entity, gets encounterTypeUUID from Form, gets locationUUID from Cohort, get encounterProvider from User 
+export const ObservationTableScript = `  
+CREATE TABLE IF NOT EXISTS Observation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE SET NULL,
+    patientUUID TEXT,
+    FOREIGN KEY (form_id) REFERENCES Form(id) ON DELETE SET NULL,
+    formUUID TEXT,
+    encounterDateTime TEXT,
+    active TEXT    
+);`;
+
+//Observations values sabes
+export const ObservationValueTableScript = `  
+CREATE TABLE IF NOT EXISTS ObservationValue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    FOREIGN KEY (observation_id) REFERENCES Observation(id) ON DELETE SET NULL,
+    value TEXT,
+    concepUUID TEXT,
+    formFieldNamespace TEXT,
+    formFieldPath TEXT,
+    active TEXT    
+);`;
+
 
 export const CohortTableScript = `  
 CREATE TABLE IF NOT EXISTS Cohort (

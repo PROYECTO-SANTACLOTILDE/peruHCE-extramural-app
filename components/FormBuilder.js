@@ -1,17 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, StyleSheet, TextInput } from "react-native";
+import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
+import { restoreQuouteInFrom } from '../utils/formFunctions';
 
 export const FormBuilder = ({formObject}) => {
 
     const [formBody, setFormBody] = useState(null);
+    const [observations, setObservation] = useState([]);
     
     useEffect(() => {
-        setFormBody(JSON.parse(formObject.body));
-        
+        console.log(formObject.body);
+        setFormBody(JSON.parse( restoreQuouteInFrom( formObject.body )));
+        setObservation( );
     }, []);
 
     return (
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         {/* Form Name */}
         <View style={styles.row}>
           <Text style={styles.key}>Nombre: </Text>
@@ -30,7 +33,7 @@ export const FormBuilder = ({formObject}) => {
         
         {/* Form Builder (AMPATH ENGINE ADAPTATION) */}
         <FormPager formBody={JSON.parse(formObject.body)}/>
-      </View>
+      </ScrollView>
     );
 };
 

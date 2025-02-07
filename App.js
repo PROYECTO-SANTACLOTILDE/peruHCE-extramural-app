@@ -15,7 +15,7 @@ import * as ScreenOrientation from "expo-screen-orientation";
 //Screens
 import { COLOR_DARK_GREEN, COLOR_RED, COLOR_WHITE, DB_NAME } from './utils/constants';
 import { cleanDB, fillDummyCohort, fillDummyForm, fillDummyPatients, fillDummyVariables, resetDB_user_version } from './utils/dbUtils/fillDummyData.js';
-import { CohortTableScript, EncounterAttributesTableScript, EraseRowsTablesScript, FormTableScript, LogTableScript, PatientTableScript, UserTableScript, VariablesTableScript, VisitAttributesTableScript, VisitTableScript } from './utils/dbUtils/dbInitializationScripts';
+import { CohortTableScript, EncounterAttributesTableScript, EraseRowsTablesScript, FormTableScript, LogTableScript, ObservationTableScript, ObservationValueTableScript, PatientTableScript, UserTableScript, VariablesTableScript, VisitAttributesTableScript, VisitTableScript } from './utils/dbUtils/dbInitializationScripts';
 import FormsScreen from './screens/FormsScreen';
 import PatientListScreen from './screens/PatientListScreen';
 import VisitInfoScreen from './screens/VisitInfoScreen';
@@ -250,8 +250,12 @@ async function migrateDbIfNeeded(db) {
   console.log("Starting Database");
   console.log("Using key: ",dbKey);
   const DATABASE_VERSION = 1;
-  let first =  await db.execAsync(`PRAGMA key = '${dbKey}';`);
-  let result = await db.getFirstAsync('PRAGMA user_version');
+
+  let first  =  await db.execAsync(`PRAGMA key = '${dbKey}';`);
+  let second =  await db.execAsync("PRAGMA journal_mode = 'wal';");
+  let third  =  await db.execAsync("PRAGMA foreign_keys = ON;");
+
+  let result =  await db.getFirstAsync('PRAGMA user_version');
   let currentDbVersion = result.user_version;
   console.log('InDevice: ',currentDbVersion,' Version: ',DATABASE_VERSION);
   
@@ -265,10 +269,11 @@ async function migrateDbIfNeeded(db) {
 
   if (currentDbVersion === 0) {
     console.log("Creating Tables");
-    let finalScript = "PRAGMA journal_mode = 'wal';" + 
-                      PatientTableScript + 
+    let finalScript = PatientTableScript + 
                       UserTableScript +
                       FormTableScript +
+                      ObservationTableScript +
+                      ObservationValueTableScript +
                       CohortTableScript + 
                       VisitTableScript +                       
                       VisitAttributesTableScript +

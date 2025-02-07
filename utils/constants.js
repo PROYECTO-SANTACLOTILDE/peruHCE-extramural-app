@@ -13,6 +13,8 @@ export const COLOR_BLACK = "#161616";
 export const COLOR_WHITE = "#fff";
 export const COLOR_RED = "#b50706";
 
+// Text Replacement
+export const SQUOTE = "__SQUOTE__";
 
 
 //Result Codes:

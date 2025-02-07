@@ -44,8 +44,6 @@ function getEthnicityOfCohortMember(member){
 export async function fillCohortMembersDB(db, baseUrl, endpoint, cohortUUID){
 
     
-
-    
     // Fetch Cohort Members
     try {
 
@@ -60,7 +58,7 @@ export async function fillCohortMembersDB(db, baseUrl, endpoint, cohortUUID){
         let patientsListFormated = [];
 
 
-        console.log('Fetching: ', baseUrl+endpoint+'cohortm/cohortmember?limit=100&v=full&cohort='+cohortUUID);
+        //console.log('Fetching: ', baseUrl+endpoint+'cohortm/cohortmember?limit=100&v=full&cohort='+cohortUUID);
         const response = await fetch(baseUrl+endpoint+'cohortm/cohortmember?limit=100&v=full&cohort='+cohortUUID, {
             method: 'GET',
             headers: {
@@ -76,30 +74,52 @@ export async function fillCohortMembersDB(db, baseUrl, endpoint, cohortUUID){
 
         const jsonData = await response.json();        
         
-        console.log('fetch result: ',jsonData);
+        //console.log('fetch result: ',jsonData);
 
         patientsListRaw = jsonData.results;
+        //console.log(patientsListRaw);
         
-        console.log('to log: ', 'COHORT '+ cohortUUID + ' in ' + baseUrl+endpoint+'cohortm/cohortmember?limit=100&v=full&cohort='+cohortUUID + ' consulted successfully. Received '+ patientsListRaw.length.toString() +' results.');
+        //console.log('to log: ', 'COHORT '+ cohortUUID + ' in ' + baseUrl+endpoint+'cohortm/cohortmember?limit=100&v=full&cohort='+cohortUUID + ' consulted successfully. Received '+ patientsListRaw.length.toString() +' results.');
         let logResult = await writeLog(db,LOG_COHORT, 'COHORT '+ cohortUUID + ' in ' + baseUrl+endpoint+'cohortm/cohortmember?limit=100&v=full&cohort='+cohortUUID + ' consulted successfully. Received '+ patientsListRaw.length.toString() +' results.');
 
         //Reformat object
-        patientsListFormated = patientsListRaw.map(member => {
-            return {
-                uuid:               member.patient.uuid,
-                dni:                getDniOfCohortMember(member),
-                givenName:          member.patient.person.preferredName.givenName || "",
-                middleName:         member.patient.person.preferredName.middleName || "",
-                paternalLastName:   getPatientPaternalLastName(member),
-                maternalLastName:   getPatientMaternalLastName(member),
-                sex:                getPatientSex(member),
-                birthDate:          getLocalformatDate(member),
-                ethnicity:          'test',
-                active:             "1"
-            };
-        });
+        patientsListFormated = patientsListRaw.map(member => ({            
+            uuid:               member.patient.uuid,
+            dni:                getDniOfCohortMember(member),
+            givenName:          member.patient?.person?.preferredName?.givenName  || "",
+            middleName:         member.patient?.person?.preferredName?.middleName || "",
+            paternalLastName:   getPatientPaternalLastName(member),
+            maternalLastName:   getPatientMaternalLastName(member),
+            sex:                getPatientSex(member),
+            birthDate:          member.patient?.person?.birthdate || "",
+            ethnicity:          'test',
+            active:             "1"            
+        }));
+        //console.log('formatedPatients: ',patientsListFormated);
 
-    console.log(patientsListFormated);
+        //Get uuid of patients that already are in the database
+        let existingPatients = await db.getAllAsync(`SELECT uuid FROM Patient WHERE active = '1';`);
+        console.log('existing patients: ',existingPatients);
+
+        let patientsInserted = patientsListFormated.length;
+        for(const patient of patientsListFormated){
+            //Check if patient already exists, not check if there arent any patients in device            
+            if( patientsInserted.length > 0 && existingPatients.some(item => item.uuid === patient.uuid) === true){
+                //Log
+                const logEx = await writeLog(db,LOG_PATIENT,`Patient already exists. DNI: ${patient.dni}, UUID: ${patient.uuid}, Full-Name: ${ patient.givenName + " " + patient.middleName + " " + patient.paternalLastName + " " + patient.maternalLastName}.`);
+                patientsInserted--;
+                continue;
+            }        
+            
+            //Insert Patient
+            //console.log(patient);
+            const result = await db.runAsync('INSERT INTO Patient (uuid, dni,givenName,middleName,paternalLastName,maternalLastName,sex,birthDate,ethnicity,active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', patient.uuid, patient.dni, patient.givenName, patient.middleName, patient.paternalLastName, patient.maternalLastName, patient.sex, patient.birthDate, patient.ethnicity, patient.active);
+            if(result.changes === 0) throw new Error(`Patient ${patient.givenName} ${patient.paternalLastName} from cohort couldn't get saved in Database.`);
+            //console.log('result: ',result);
+            //Log
+            const log = await writeLog(db,LOG_PATIENT,`Patient inserted. DNI: ${patient.dni}, UUID: ${patient.uuid}, Full-Name: ${ patient.givenName + " " + patient.middleName + " " + patient.paternalLastName + " " + patient.maternalLastName}.`);
+        }
+        console.log('inserted ',patientsInserted,' of ',patientsListFormated.length,' fetched');
 
     } catch (err) {
         const logResult = await writeLog(db,LOG_COHORT, 'COHORT '+ cohortUUID + ' in ' + baseUrl+endpoint+'cohortm/cohortmember?limit=100&v=full&cohort='+cohortUUID + ' consulted un-successfully.');
@@ -107,21 +127,6 @@ export async function fillCohortMembersDB(db, baseUrl, endpoint, cohortUUID){
     } 
     
     
-    
-    //Enter cohort members to database
-    const formattedArray = await Promise.all(patientsListFormated.map(async (member) => {
-        try {
-            //Insert Patient
-            const result = await db.runAsync('INSERT INTO Patient (uuid, dni,givenName,middleName,paternalLastName,maternalLastName,sex,birthDate,ethnicity,active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', member.uuid, member.dni, member.givenName, member.middleName, member.paternalLastName, member.maternalLastName, member.sex, member.birthDate, member.ethnicity, member.active);
-            //Log
-            const log = await writeLog(db,LOG_PATIENT,`Patient inserted. DNI: ${member.dni}, UUID: ${member.uuid}, Full-Name: ${ member.givenName + " " + member.middleName + " " + member.paternalLastName + " " + member.maternalLastName}.`);
-        }catch (error) {
-            const log = await writeLog(db,LOG_PATIENT,`Eror when Patient was inserted. DNI: ${member.dni}, UUID: ${member.uuid}, Full-Name: ${ member.givenName + " " + member.middleName + " " + member.paternalLastName + " " + member.maternalLastName}.`);
-            throw new Error('Error inserting patient to database');
-        }
-        
-    }));
-
     return patientsListFormated;    
 
 }

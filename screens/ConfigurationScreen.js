@@ -21,7 +21,7 @@ export default function ConfigurationScreen() {
 
     const consultConfigVariables = async () => {
         setLoading(true);
-        try {           
+        try {          
 
             let variablesRows = await db.getAllAsync("SELECT * FROM Variable WHERE active = '1';");
 

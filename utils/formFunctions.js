@@ -1,33 +1,20 @@
-//Date functions
+//Form functions
 
-// Assumes it uses the ISO 8601 extended format (YYYY-MM-DDTHH:mm:ss.sss±HH:mm)
-export function getLocalformatDate(patientInfo){
-    if(patientInfo == null) return "";
-    if(dateString == "") return "-";
+import { SQUOTE } from "./constants";
 
-    const dateString = patientInfo.patient.person.birthdate;
-
-    const date = new Date(dateString); // Parse the date string
-    const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with 0
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-based, so add 1)
-    const year = date.getFullYear(); // Get year
-  
-    return `${day}-${month}-${year}`;
+// Build empty structure to save answers
+export function replaceQuoteInForm(formString){
+    if(formString === undefined) return "";
+    if(formString === null) return "";
+    return formString.replace(/'/g, SQUOTE);
 };
 
 // Use
-export function getLocalformatDateDB(dateString){
-    if(dateString == null) return "";
-    if(dateString == "") return "-";
-
-    const date = new Date(dateString); // Parse the date string
-    const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with 0
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-based, so add 1)
-    const year = date.getFullYear(); // Get year
-  
-    return `${day}-${month}-${year}`;
-};
-
+export function restoreQuouteInFrom(formString){
+    if(formString === undefined) return "";
+    if(formString === null) return "";
+    return formString.replace(new RegExp(placeholder, "g"), "'");
+}
 
 // Assumes it uses the ISO 8601 extended format (YYYY-MM-DDTHH:mm:ss.sss±HH:mm)
 export function getAge(patientInfo){

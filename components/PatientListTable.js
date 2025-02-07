@@ -29,7 +29,7 @@ export const PatientListTable = ({patientList}) => {
         <Text style={styles.cell}>{getPatientMaternalLastName(item)}</Text> 
         <Text style={styles.cell}>{getPatientSex(item)}</Text>       
         <Text style={styles.cell}>{getLocalformatDate(item)}</Text>         
-        <Text style={styles.cell}>{getAge(item)}</Text>                               
+        <Text style={styles.cell}>{getAgeDB(item)}</Text>                               
         <Text style={styles.cell}>Test</Text>                                    
       </View>
     );
