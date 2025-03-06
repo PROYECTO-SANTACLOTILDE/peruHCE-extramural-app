@@ -14,7 +14,7 @@ export const COLOR_WHITE = "#fff";
 export const COLOR_RED = "#b50706";
 
 // Text Replacement
-export const SQUOTE = "__SQUOTE__";
+export const SQUOTE = "__SINGLE_QUOTE__";
 
 
 //Result Codes:

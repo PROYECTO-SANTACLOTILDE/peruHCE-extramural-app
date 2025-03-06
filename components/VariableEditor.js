@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Modal, ScrollView} from "react-native";
-import { fillCohortMembersDB } from '../utils/cohortFunctions';
+import { fillCohortMembersDB, fillFormDB } from '../utils/cohortFunctions';
 import { updateVariableDb } from '../utils/dbUtils/dbVariableFunctions';
 
 import styles from './VariableEditorStyles.js';
@@ -56,6 +56,43 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
             //console.log('cohortUUID: ',cohortUUID);
 
             let result = await fillCohortMembersDB(db, baseUrl, endPoint, cohortUUID);
+
+        }catch (err) {
+            throw new Error('Error getting variables to fetch cohort members: ', err);
+        }    
+        
+             
+    };
+
+    const getForm = async (db) => {
+        try{
+
+
+            const baseUrlVariable = variableList.find(item => item.key === "BASE_URL");
+            //console.log('baseUrl: ',baseUrlVariable);
+            if(baseUrlVariable === undefined){
+                throw new Error("No BASE_URL variable found in database.");
+            }            
+            const baseUrl = baseUrlVariable.value;
+            //console.log('baseUrl: ',baseUrl);
+            
+            const baseEndpointVariable = variableList.find(item => item.key === "BASE_ENDPOINT");
+            //console.log('endPoint: ',baseEndpointVariable);
+            if(baseEndpointVariable === undefined){
+                throw new Error('No BASE_ENDPOINT variable found in database.');
+            }   
+            const endPoint = baseEndpointVariable.value;
+            //console.log('endPoint: ',endPoint);
+
+            const formVariable = variableList.find(item => item.key === "FORM");
+            //console.log('formUUID: ',formVariable);
+            if(formVariable === undefined){
+                throw new Error('No FORM variable found in database.');
+            }  
+            const formUUID = formVariable.value;
+            //console.log('cohortUUID: ',cohortUUID);
+
+            let result = await fillFormDB(db, baseUrl, endPoint, formUUID);
 
         }catch (err) {
             throw new Error('Error getting variables to fetch cohort members: ', err);
@@ -126,11 +163,15 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
                 </View>
             </Modal>
 
-            <Button title="Cargar pacientes" onPress={() => handlePress(db) } />
+            <Button title="Cargar pacientes" style={ styles.button } onPress={() => handlePress(db) } />
+            <Button title="Cargar formulario" style={ styles.button } onPress={() => getForm(db) } />
+        
         
         </ScrollView>        
       </View>
     );
 };
+
+
 
 

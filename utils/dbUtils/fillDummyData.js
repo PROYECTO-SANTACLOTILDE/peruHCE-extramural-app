@@ -21,12 +21,17 @@ export async function fillDummyPatients(db) {
 }
 
 export async function fillDummyForm(db) {
-    //console.log(JSON.stringify(dummyForm2));
+    const test = { hideWhenExpression: "emergencia !== '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'"};
+    /* console.log(test);
+    console.log(test.hideWhenExpression);
+    console.log(JSON.stringify(test)); */
     const result = await db.execAsync(`
-        INSERT INTO Form (uuid, name, description, body, encounterType, encounterTypeUUID, active) VALUES
-        ('abc',     'SOAP Note Template', 'SOAP Note Template', '${replaceQuoteInForm( JSON.stringify(dummyForm2) )}', 'Visit Note',      'd7151f82-c1f3-4152-a605-2f9ea7414a79',  '1');        
-    `);
-    console.log('result: ',result);
+        INSERT INTO Form 
+        ( uuid,  name,                 description,          body,    encounterType, encounterTypeUUID,                      active) VALUES 
+        ( 'abc', 'SOAP Note Template', 'SOAP Note Template', '${replaceQuoteInForm(JSON.stringify(dummyForm))}', 'Visit Note',  'd7151f82-c1f3-4152-a605-2f9ea7414a79', '1')
+    ;`);
+
+    
 }
 
 export async function fillDummyCohort(db) {
@@ -41,7 +46,8 @@ export const baseVariables = `
     INSERT INTO Variable (key, value, active) VALUES
     ('BASE_URL',        '${process.env.EXPO_PUBLIC_BASE_URL}',     '1'),
     ('BASE_ENDPOINT',   '${process.env.EXPO_PUBLIC_BASE_ENDPOINT}','1'),
-    ('COHORT',          '7cbb4e03-d81b-4360-9840-c98a5ccbeb41',   '1');       
+    ('COHORT',          '646e0f6c-4ba9-4bd7-a1de-d4425af3a01b',   '1'),   
+    ('FORM',          '---',   '1');    
 `;
 
 export async function fillDummyVariables(db) {
@@ -59,7 +65,7 @@ export async function resetDB_user_version(db) {
 
 export async function cleanDB(db) {
     const result = await db.execAsync(EraseRowsTablesScript);
-    console.log(result);
+
     console.log("Database cleaned.");
 }
 

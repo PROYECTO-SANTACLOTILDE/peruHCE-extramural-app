@@ -62,6 +62,9 @@ export default function FormsScreen() {
                 const db = await SQLite.openDatabaseAsync(DB_NAME);
     
                 let formRow = await db.getFirstAsync(`SELECT * FROM Form WHERE active = '1';`);
+
+                //console.log('formRow: ',formRow);
+
                 setForm(formRow);
                 
                 setError(null);

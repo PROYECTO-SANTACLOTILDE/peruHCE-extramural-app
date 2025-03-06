@@ -64,8 +64,8 @@ export function getAgeDB(birthDateString){
     // Get the current date
     const today = new Date();
 
-    console.log(birthDateString);
-    console.log(birthDate, ' vs ', today);
+    //console.log(birthDateString);
+    //console.log(birthDate, ' vs ', today);
     
     // Calculate the age
     let age = today.getFullYear() - birthDate.getFullYear();

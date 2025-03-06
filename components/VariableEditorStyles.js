@@ -3,6 +3,9 @@ import { StyleSheet} from "react-native";
 
 //Styles
 export const styles = StyleSheet.create({
+    button:{
+        margin: 20
+    },
     container: {
         padding: 16,
     },

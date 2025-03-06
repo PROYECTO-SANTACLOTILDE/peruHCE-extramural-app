@@ -32,6 +32,12 @@
           "enableFTS": true,
           "useSQLCipher": true
         }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
       ]
     ],
     "extra": {

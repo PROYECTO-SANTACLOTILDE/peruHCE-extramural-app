@@ -13,7 +13,7 @@ export function replaceQuoteInForm(formString){
 export function restoreQuouteInFrom(formString){
     if(formString === undefined) return "";
     if(formString === null) return "";
-    return formString.replace(new RegExp(placeholder, "g"), "'");
+    return formString.replace(new RegExp(SQUOTE, 'g'), "'");
 }
 
 // Assumes it uses the ISO 8601 extended format (YYYY-MM-DDTHH:mm:ss.sss±HH:mm)

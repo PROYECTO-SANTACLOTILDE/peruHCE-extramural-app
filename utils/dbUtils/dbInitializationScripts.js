@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS Patient (
 export const UserTableScript = `  
 CREATE TABLE IF NOT EXISTS User (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL,
     uuid TEXT NOT NULL,
     displayName TEXT,
     role TEXT NOT NULL,
@@ -68,24 +70,25 @@ CREATE TABLE IF NOT EXISTS Form (
 export const ObservationTableScript = `  
 CREATE TABLE IF NOT EXISTS Observation (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE SET NULL,
+    patient_id INTEGER,    
     patientUUID TEXT,
-    FOREIGN KEY (form_id) REFERENCES Form(id) ON DELETE SET NULL,
+    form_id INTEGER,    
     formUUID TEXT,
     encounterDateTime TEXT,
-    active TEXT    
+    active TEXT  
 );`;
 
 //Observations values sabes
 export const ObservationValueTableScript = `  
 CREATE TABLE IF NOT EXISTS ObservationValue (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    FOREIGN KEY (observation_id) REFERENCES Observation(id) ON DELETE SET NULL,
+    observation_id INTEGER,    
     value TEXT,
     concepUUID TEXT,
     formFieldNamespace TEXT,
     formFieldPath TEXT,
-    active TEXT    
+    active TEXT,
+    FOREIGN KEY (observation_id) REFERENCES Observation(id)   
 );`;
 
 

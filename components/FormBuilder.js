@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
 import { restoreQuouteInFrom } from '../utils/formFunctions';
+import { COLOR_DARK_GREEN } from '../utils/constants';
 
 export const FormBuilder = ({formObject}) => {
 
@@ -8,8 +9,9 @@ export const FormBuilder = ({formObject}) => {
     const [observations, setObservation] = useState([]);
     
     useEffect(() => {
-        console.log(formObject.body);
-        setFormBody(JSON.parse( restoreQuouteInFrom( formObject.body )));
+
+        setFormBody(JSON.parse( formObject.body ));
+
         setObservation( );
     }, []);
 
@@ -32,7 +34,8 @@ export const FormBuilder = ({formObject}) => {
         </View>
         
         {/* Form Builder (AMPATH ENGINE ADAPTATION) */}
-        <FormPager formBody={JSON.parse(formObject.body)}/>
+        {/* <Text>{restoreQuouteInFrom(formObject.body)}</Text> */}
+        {<FormPager formBody={JSON.parse(formObject.body)}/>}
       </ScrollView>
     );
 };
@@ -40,6 +43,7 @@ export const FormBuilder = ({formObject}) => {
 const FormPager = ({formBody}) => {
 
     if(formBody.pages.length === 0) return ( <Text>No hay páginas</Text> );
+    
 
     return(
         <View>
@@ -114,11 +118,14 @@ const styles = StyleSheet.create({
         color: 'gray',
     },
     page: {
-        borderWidth: 1,
-        borderColor: '#ccc',
+        borderWidth: 2,
+        borderColor: COLOR_DARK_GREEN,
         padding: 10,
-        marginBottom: 5,
+        marginBottom: 10,
         borderRadius: 5,
+    },
+    page: {
+        fontWeight: 'bold',
     },
     questionTextArea: {
         height: 40,
