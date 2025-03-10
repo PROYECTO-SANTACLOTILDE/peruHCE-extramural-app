@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react';
 import { StyleSheet, Text, TextInput, View, Button, TouchableOpacity } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaView } from "react-native-safe-area-context";
+
 
 //Expo SQL Lite
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
@@ -28,7 +28,6 @@ import ConfigurationScreen from './screens/ConfigurationScreen';
 import LogScreen from './screens/LogScreen.js';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry.js';
 import { Login } from './components/Login.js';
 
 const Stack = createNativeStackNavigator();
@@ -236,10 +235,8 @@ const HomeButtonGrid = () => {
 
 const LoginComponent = () => {
   return (
-    <SQLiteProvider databaseName={DB_NAME} onInit={migrateDbIfNeeded}> 
-      <Login />
-    </SQLiteProvider>
-);
+    <Login> </Login>
+  );
 }
 
 
@@ -327,15 +324,17 @@ export default function App() {
     <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Configuración Inicial" component={KeyCheckerComponent} />
-          <Stack.Screen name="Inicio de Sesión" component={LoginComponent} />
-          <Stack.Screen name="Inicio" component={HomeButtonGrid} />
-          <Stack.Screen name="Lista de Pacientes" component={PatientListScreen} />
-          <Stack.Screen name="Formularios Cargados" component={FormsScreen} />
-          <Stack.Screen name="Ajuste de Visita" component={VisitInfoScreen} />
-          <Stack.Screen name="Configuración" component={ConfigurationScreen} />
-          <Stack.Screen name="Visor de Logs" component={LogScreen} />
-          {/*<Stack.Screen name="Screen5" component={Screen5} />
-          <Stack.Screen name="Screen6" component={Screen6} /> */}
+          <SQLiteProvider databaseName={DB_NAME} onInit={migrateDbIfNeeded}> 
+            <Stack.Screen name="Inicio de Sesión" component={LoginComponent} />            
+            <Stack.Screen name="Inicio" component={HomeButtonGrid} />
+            <Stack.Screen name="Lista de Pacientes" component={PatientListScreen} />
+            <Stack.Screen name="Formularios Cargados" component={FormsScreen} />
+            <Stack.Screen name="Ajuste de Visita" component={VisitInfoScreen} />
+            <Stack.Screen name="Configuración" component={ConfigurationScreen} />
+            <Stack.Screen name="Visor de Logs" component={LogScreen} />
+            {/*<Stack.Screen name="Screen5" component={Screen5} />
+            <Stack.Screen name="Screen6" component={Screen6} /> */}
+          </SQLiteProvider>
         </Stack.Navigator>     
     </NavigationContainer>  
 

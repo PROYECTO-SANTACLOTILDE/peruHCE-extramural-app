@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Modal, ScrollView} from "react-native";
-import { fillCohortMembersDB, fillFormDB } from '../utils/cohortFunctions';
-import { updateVariableDb } from '../utils/dbUtils/dbVariableFunctions';
+import { fillCohortMembersDB } from '@Utils/cohortFunctions';
+import { fillFormDB } from '@Utils/formFunctions';
+import { updateVariableDb } from '@Utils/dbUtils/dbVariableFunctions';
 
 import styles from './VariableEditorStyles.js';
 
@@ -66,15 +67,13 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
 
     const getForm = async (db) => {
         try{
-
-
             const baseUrlVariable = variableList.find(item => item.key === "BASE_URL");
             //console.log('baseUrl: ',baseUrlVariable);
             if(baseUrlVariable === undefined){
                 throw new Error("No BASE_URL variable found in database.");
             }            
             const baseUrl = baseUrlVariable.value;
-            //console.log('baseUrl: ',baseUrl);
+            console.log('baseUrl: ',baseUrl);
             
             const baseEndpointVariable = variableList.find(item => item.key === "BASE_ENDPOINT");
             //console.log('endPoint: ',baseEndpointVariable);
@@ -82,7 +81,7 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
                 throw new Error('No BASE_ENDPOINT variable found in database.');
             }   
             const endPoint = baseEndpointVariable.value;
-            //console.log('endPoint: ',endPoint);
+            console.log('endPoint: ',endPoint);
 
             const formVariable = variableList.find(item => item.key === "FORM");
             //console.log('formUUID: ',formVariable);
@@ -90,7 +89,7 @@ export const VariableEditor = ({variableList, refreshVariables}) => {
                 throw new Error('No FORM variable found in database.');
             }  
             const formUUID = formVariable.value;
-            //console.log('cohortUUID: ',cohortUUID);
+            console.log('cohortUUID: ',formUUID);
 
             let result = await fillFormDB(db, baseUrl, endPoint, formUUID);
 

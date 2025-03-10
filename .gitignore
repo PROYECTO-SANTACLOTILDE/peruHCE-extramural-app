@@ -38,3 +38,6 @@ yarn-error.*
 
 #build
 .android
+
+# Vs Code
+.vscode

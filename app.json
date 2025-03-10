@@ -2,6 +2,7 @@
   "expo": {
     "name": "peruHCE-extramural-app",
     "slug": "peruHCE-extramural-app",
+    "scheme": "peruHCE-extramural-app-scheme",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -38,7 +39,8 @@
         {
           "configureAndroidBackup": true
         }
-      ]
+      ],
+      "expo-router"
     ],
     "extra": {
       "eas": {

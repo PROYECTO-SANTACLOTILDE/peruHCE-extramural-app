@@ -46,10 +46,10 @@ CREATE TABLE IF NOT EXISTS User (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     password TEXT NOT NULL,
-    uuid TEXT NOT NULL,
+    uuid TEXT,
     displayName TEXT,
-    role TEXT NOT NULL,
-    roleDescription TEXT NOT NULL,
+    role TEXT,
+    roleDescription TEXT NULL,
     active TEXT
 );`;
 
